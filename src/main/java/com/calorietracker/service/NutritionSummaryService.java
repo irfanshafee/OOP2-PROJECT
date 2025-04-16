@@ -6,46 +6,38 @@ import java.util.List;
 
 public class NutritionSummaryService {
     private final MealService mealService;
-    private final double DAILY_CALORIE_TARGET = 2000.0;
-    private final double DAILY_PROTEIN_TARGET = 150.0;  // in grams
-    private final double DAILY_CARBS_TARGET = 250.0;    // in grams
-    private final double DAILY_FAT_TARGET = 70.0;       // in grams
+    private final NutritionConfigService configService;
+    private final NutritionDisplayService displayService;
 
-    public NutritionSummaryService(MealService mealService) {
+    public NutritionSummaryService(MealService mealService, NutritionConfigService configService, 
+            NutritionDisplayService displayService) {
         this.mealService = mealService;
+        this.configService = configService;
+        this.displayService = displayService;
     }
 
     public void displayDailySummary(LocalDateTime date) {
         List<MealEntry> dailyMeals = mealService.getMealsByDate(date);
-        
-        double totalCalories = 0;
-        double totalProtein = 0;
-        double totalCarbs = 0;
-        double totalFats = 0;
+        NutritionTotals totals = calculateDailyTotals(dailyMeals);
+        displayService.displayNutritionSummary(date, totals.calories, totals.protein, 
+            totals.carbs, totals.fats);
+    }
 
-        for (MealEntry meal : dailyMeals) {
-            totalCalories += meal.getCalories();
-            totalProtein += meal.getProtein();
-            totalCarbs += meal.getCarbohydrates();
-            totalFats += meal.getFats();
+    private NutritionTotals calculateDailyTotals(List<MealEntry> meals) {
+        NutritionTotals totals = new NutritionTotals();
+        for (MealEntry meal : meals) {
+            totals.calories += meal.getCalories();
+            totals.protein += meal.getProtein();
+            totals.carbs += meal.getCarbohydrates();
+            totals.fats += meal.getFats();
         }
+        return totals;
+    }
 
-        System.out.println("\n=== Nutrition Summary for " + date.toLocalDate() + " ===");
-        System.out.println("\nTotal Intake:");
-        System.out.printf("Calories: %.2f kcal\n", totalCalories);
-        System.out.printf("Protein: %.2f g\n", totalProtein);
-        System.out.printf("Carbohydrates: %.2f g\n", totalCarbs);
-        System.out.printf("Fats: %.2f g\n", totalFats);
-
-        System.out.println("\nDaily Targets Comparison:");
-        System.out.printf("Calories: %.2f%% (%.2f/%.2f kcal)\n", 
-            (totalCalories/DAILY_CALORIE_TARGET) * 100, totalCalories, DAILY_CALORIE_TARGET);
-        System.out.printf("Protein: %.2f%% (%.2f/%.2f g)\n", 
-            (totalProtein/DAILY_PROTEIN_TARGET) * 100, totalProtein, DAILY_PROTEIN_TARGET);
-        System.out.printf("Carbohydrates: %.2f%% (%.2f/%.2f g)\n", 
-            (totalCarbs/DAILY_CARBS_TARGET) * 100, totalCarbs, DAILY_CARBS_TARGET);
-        System.out.printf("Fats: %.2f%% (%.2f/%.2f g)\n", 
-            (totalFats/DAILY_FAT_TARGET) * 100, totalFats, DAILY_FAT_TARGET);
-        System.out.println("\n==================================\n");
+    private static class NutritionTotals {
+        double calories = 0;
+        double protein = 0;
+        double carbs = 0;
+        double fats = 0;
     }
 }
