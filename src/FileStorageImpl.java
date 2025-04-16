@@ -1,4 +1,4 @@
-package com.calorietracker.core.storage;
+package com.calorietracker;
 
 import java.io.*;
 import java.nio.file.*;
@@ -11,6 +11,11 @@ import java.util.ArrayList;
  */
 public class FileStorageImpl implements IFileStorage {
     private final String dataDirectory;
+
+    public FileStorageImpl() {
+        this.dataDirectory = "data";
+        createDataDirectoryIfNotExists();
+    }
 
     public FileStorageImpl(String dataDirectory) {
         this.dataDirectory = dataDirectory;
@@ -25,15 +30,11 @@ public class FileStorageImpl implements IFileStorage {
         }
     }
 
-    private Path getFilePath(String filename) {
-        return Paths.get(dataDirectory, filename);
-    }
-
     @Override
     public void saveToFile(String data, String filename) {
+        Path filePath = Paths.get(dataDirectory, filename);
         try {
-            Files.write(getFilePath(filename), data.getBytes(), StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(filePath, data.getBytes());
         } catch (IOException e) {
             throw new StorageException("Failed to save file: " + filename, e);
         }
@@ -41,7 +42,7 @@ public class FileStorageImpl implements IFileStorage {
 
     @Override
     public Optional<String> readFromFile(String filename) {
-        Path filePath = getFilePath(filename);
+        Path filePath = Paths.get(dataDirectory, filename);
         if (!Files.exists(filePath)) {
             return Optional.empty();
         }
@@ -54,19 +55,13 @@ public class FileStorageImpl implements IFileStorage {
     }
 
     @Override
-    public void appendToFile(String data, String filename) {
-        try {
-            Files.write(getFilePath(filename), data.getBytes(), StandardOpenOption.CREATE,
-                    StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            throw new StorageException("Failed to append to file: " + filename, e);
-        }
-    }
-
-    @Override
     public List<String> readAllLines(String filename) {
+        Path filePath = Paths.get(dataDirectory, filename);
+        if (!Files.exists(filePath)) {
+            return new ArrayList<>();
+        }
         try {
-            return Files.readAllLines(getFilePath(filename));
+            return Files.readAllLines(filePath);
         } catch (IOException e) {
             throw new StorageException("Failed to read lines from file: " + filename, e);
         }
@@ -74,6 +69,17 @@ public class FileStorageImpl implements IFileStorage {
 
     @Override
     public boolean fileExists(String filename) {
-        return Files.exists(getFilePath(filename));
+        Path filePath = Paths.get(dataDirectory, filename);
+        return Files.exists(filePath);
+    }
+
+    @Override
+    public boolean deleteFile(String filename) {
+        Path filePath = Paths.get(dataDirectory, filename);
+        try {
+            return Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new StorageException("Failed to delete file: " + filename, e);
+        }
     }
 }

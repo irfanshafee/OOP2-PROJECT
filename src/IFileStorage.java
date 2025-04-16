@@ -1,4 +1,4 @@
-package com.calorietracker.core.storage;
+package com.calorietracker;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,18 +19,10 @@ public interface IFileStorage {
     /**
      * Reads data from a file.
      * @param filename The name of the file to read from
-     * @return Optional containing the file contents if successful, empty if file doesn't exist
+     * @return Optional containing the file contents, or empty if file doesn't exist
      * @throws StorageException if there's an error during read
      */
     Optional<String> readFromFile(String filename);
-
-    /**
-     * Appends data to an existing file.
-     * @param data The data to append
-     * @param filename The name of the file to append to
-     * @throws StorageException if there's an error during append
-     */
-    void appendToFile(String data, String filename);
 
     /**
      * Reads all lines from a file.
@@ -46,4 +38,11 @@ public interface IFileStorage {
      * @return true if file exists, false otherwise
      */
     boolean fileExists(String filename);
+
+    /**
+     * Deletes a file.
+     * @param filename The name of the file to delete
+     * @return true if deletion was successful, false otherwise
+     */
+    boolean deleteFile(String filename);
 }
