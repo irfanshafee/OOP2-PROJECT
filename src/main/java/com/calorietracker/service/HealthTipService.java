@@ -1,4 +1,4 @@
-package com.calorietracker.service;
+`package com.calorietracker.service;
 
 import com.calorietracker.core.health.IHealthTipService;
 import com.calorietracker.model.HealthTip;
@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.UUID;
 
 public class HealthTipService implements IHealthTipService {
-    private final NutritionSummaryService nutritionSummaryService;
     private final MealService mealService;
+    private final NutritionConfigService configService;
 
     private final double PROTEIN_LOW_THRESHOLD = 0.5;  // 50% of daily target
     private final double FAT_HIGH_THRESHOLD = 0.8;     // 80% of daily target
     private final double CARBS_HIGH_THRESHOLD = 0.8;   // 80% of daily target
     private final double CALORIE_HIGH_THRESHOLD = 0.9; // 90% of daily target
 
-    public HealthTipService(NutritionSummaryService nutritionSummaryService, MealService mealService) {
-        this.nutritionSummaryService = nutritionSummaryService;
+    public HealthTipService(MealService mealService, NutritionConfigService configService) {
         this.mealService = mealService;
+        this.configService = configService;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class HealthTipService implements IHealthTipService {
         }
 
         // Check protein intake
-        if (totalProtein < nutritionSummaryService.DAILY_PROTEIN_TARGET * PROTEIN_LOW_THRESHOLD) {
+        if (totalProtein < configService.getDailyProteinTarget() * PROTEIN_LOW_THRESHOLD) {
             tips.add(new HealthTip(
                 UUID.randomUUID().toString(),
                 "You are low on protein today. Consider adding lean meats, eggs, or legumes to your next meal.",
@@ -52,18 +52,18 @@ public class HealthTipService implements IHealthTipService {
         }
 
         // Check fat intake
-        if (totalFats > nutritionSummaryService.DAILY_FAT_TARGET * FAT_HIGH_THRESHOLD) {
+        if (totalFats > configService.getDailyFatTarget() * FAT_HIGH_THRESHOLD) {
             tips.add(new HealthTip(
                 UUID.randomUUID().toString(),
                 String.format("You've consumed %.1f%% of your daily fat goal. Consider lighter options for your remaining meals.",
-                    (totalFats/nutritionSummaryService.DAILY_FAT_TARGET) * 100),
+                    (totalFats/configService.getDailyFatTarget()) * 100),
                 TipSeverity.MEDIUM,
                 "fat"
             ));
         }
 
         // Check carbs intake
-        if (totalCarbs > nutritionSummaryService.DAILY_CARBS_TARGET * CARBS_HIGH_THRESHOLD) {
+        if (totalCarbs > configService.getDailyCarbsTarget() * CARBS_HIGH_THRESHOLD) {
             tips.add(new HealthTip(
                 UUID.randomUUID().toString(),
                 "Your carbohydrate intake is high. Try to include more vegetables instead of refined carbs.",
@@ -73,11 +73,11 @@ public class HealthTipService implements IHealthTipService {
         }
 
         // Check calorie intake
-        if (totalCalories > nutritionSummaryService.DAILY_CALORIE_TARGET * CALORIE_HIGH_THRESHOLD) {
+        if (totalCalories > configService.getDailyCalorieTarget() * CALORIE_HIGH_THRESHOLD) {
             tips.add(new HealthTip(
                 UUID.randomUUID().toString(),
                 String.format("You're at %.1f%% of your daily calorie target. Consider lighter options for remaining meals.",
-                    (totalCalories/nutritionSummaryService.DAILY_CALORIE_TARGET) * 100),
+                    (totalCalories/configService.getDailyCalorieTarget()) * 100),
                 TipSeverity.HIGH,
                 "calories"
             ));
