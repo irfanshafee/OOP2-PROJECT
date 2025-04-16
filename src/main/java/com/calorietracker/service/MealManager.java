@@ -7,17 +7,31 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Manages meal-related operations through a console interface.
+ * This class provides functionality for viewing, editing, and deleting meals,
+ * as well as displaying meal summaries for specific dates.
+ */
 public class MealManager {
     private final MealService mealService;
     private final Scanner scanner;
     private final DateTimeFormatter dateFormatter;
 
+    /**
+     * Constructs a new MealManager with the specified MealService.
+     *
+     * @param mealService The service handling meal-related operations
+     */
     public MealManager(MealService mealService) {
         this.mealService = mealService;
         this.scanner = new Scanner(System.in);
         this.dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     }
 
+    /**
+     * Displays and handles the meal management menu.
+     * Provides options for viewing, editing, and deleting meals.
+     */
     public void displayMealManagementMenu() {
         while (true) {
             System.out.println("\n=== Meal Management Menu ===");
@@ -52,11 +66,18 @@ public class MealManager {
         }
     }
 
+    /**
+     * Retrieves and displays all meals logged for the current day.
+     */
     private void viewTodaysMeals() {
         List<MealEntry> meals = mealService.getMealsByDate(LocalDateTime.now());
         displayMeals(meals);
     }
 
+    /**
+     * Allows users to view meals for a specific date.
+     * Prompts for a date input and displays all meals logged on that date.
+     */
     private void viewMealsByDate() {
         System.out.print("Enter date (yyyy-MM-dd): ");
         String dateStr = scanner.nextLine();
@@ -69,6 +90,11 @@ public class MealManager {
         }
     }
 
+    /**
+     * Displays a list of meals with their details.
+     *
+     * @param meals The list of meal entries to display
+     */
     private void displayMeals(List<MealEntry> meals) {
         if (meals.isEmpty()) {
             System.out.println("No meals found for the specified date.");
@@ -81,6 +107,10 @@ public class MealManager {
         }
     }
 
+    /**
+     * Handles the meal editing process.
+     * Allows users to modify the food name, quantity, and meal type of an existing meal.
+     */
     private void editMeal() {
         System.out.print("Enter meal ID to edit: ");
         String mealId = scanner.nextLine();
@@ -113,6 +143,10 @@ public class MealManager {
         }
     }
 
+    /**
+     * Handles the meal deletion process.
+     * Prompts for confirmation before removing a meal from the system.
+     */
     private void deleteMeal() {
         System.out.print("Enter meal ID to delete: ");
         String mealId = scanner.nextLine();

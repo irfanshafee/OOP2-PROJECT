@@ -9,17 +9,31 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * A console-based user interface service for the Calorie Tracker application.
+ * This class handles all user interactions through the command line, providing
+ * functionality for meal logging, viewing summaries, and managing meal entries.
+ */
 public class ConsoleMenuService {
     private final MealService mealService;
     private final Scanner scanner;
     private final DateTimeFormatter dateFormatter;
 
+    /**
+     * Constructs a new ConsoleMenuService with the specified MealService.
+     *
+     * @param mealService The service handling meal-related operations
+     */
     public ConsoleMenuService(MealService mealService) {
         this.mealService = mealService;
         this.scanner = new Scanner(System.in);
         this.dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     }
 
+    /**
+     * Starts the console menu interface. This method runs the main application loop,
+     * displaying the menu and handling user input until the user chooses to exit.
+     */
     public void start() {
         boolean running = true;
         while (running) {
@@ -43,6 +57,9 @@ public class ConsoleMenuService {
         }
     }
 
+    /**
+     * Displays the main menu options to the user.
+     */
     private void displayMenu() {
         System.out.println("\n=== Calorie Tracker Menu ===");
         System.out.println("1. Log a Meal");
@@ -53,6 +70,10 @@ public class ConsoleMenuService {
         System.out.print("Enter your choice (1-5): ");
     }
 
+    /**
+     * Handles the meal logging process by collecting meal information from the user
+     * and saving it using the meal service.
+     */
     private void logMeal() {
         System.out.println("\n=== Log a Meal ===");
         
@@ -71,6 +92,10 @@ public class ConsoleMenuService {
         }
     }
 
+    /**
+     * Displays a summary of all meals for a specific date, including individual meal
+     * details and daily totals for calories and macronutrients.
+     */
     private void viewDailySummary() {
         System.out.println("\n=== Daily Summary ===");
         LocalDateTime date = getDateTime();
@@ -110,6 +135,10 @@ public class ConsoleMenuService {
         System.out.printf("Total Fats: %.2fg%n", totalFats);
     }
 
+    /**
+     * Handles the meal editing process by allowing users to modify the details
+     * of an existing meal entry.
+     */
     private void editMeal() {
         System.out.println("\n=== Edit a Meal ===");
         System.out.print("Enter meal ID: ");
@@ -141,6 +170,10 @@ public class ConsoleMenuService {
         }
     }
 
+    /**
+     * Handles the meal deletion process by removing a specified meal entry
+     * from the system.
+     */
     private void deleteMeal() {
         System.out.println("\n=== Delete a Meal ===");
         System.out.print("Enter meal ID: ");
@@ -154,6 +187,12 @@ public class ConsoleMenuService {
         }
     }
 
+    /**
+     * Prompts the user for a valid quantity input in grams.
+     *
+     * @return A positive double value representing the quantity in grams
+     * @throws IllegalArgumentException if the quantity is not positive
+     */
     private double getValidQuantity() {
         while (true) {
             try {
@@ -169,6 +208,11 @@ public class ConsoleMenuService {
         }
     }
 
+    /**
+     * Prompts the user to select a meal type from the available options.
+     *
+     * @return The selected MealType enum value
+     */
     private MealType getMealType() {
         while (true) {
             try {
@@ -185,6 +229,12 @@ public class ConsoleMenuService {
         }
     }
 
+    /**
+     * Prompts the user for a date and time input in the format "yyyy-MM-dd HH:mm".
+     *
+     * @return A LocalDateTime object representing the input date and time
+     * @throws DateTimeParseException if the input format is invalid
+     */
     private LocalDateTime getDateTime() {
         while (true) {
             try {
